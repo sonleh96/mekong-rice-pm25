@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Air pollution and rice crop health</title>
+<meta name="description" content="Satellite data on 1.1 million rice plots in Vietnam's Mekong Delta show crop health declining once PM2.5 passes about 16.5 µg/m³. Scientific Reports, 2026.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Air pollution and rice crop health: evidence from Vietnam's Mekong Delta">
+<meta property="og:description" content="Rice health in the Mekong Delta declines once PM2.5 passes about 16.5 µg/m³, just below the delta's average. Scientific Reports, 2026.">
+<meta property="og:url" content="https://sonleh96.github.io/mekong-rice-pm25/">
+<meta property="og:image" content="https://sonleh96.github.io/mekong-rice-pm25/img/og.png">
+<link rel="canonical" href="https://sonleh96.github.io/mekong-rice-pm25/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23141619'/%3E%3Cpath d='M3 12c2-5 5-8 10-9-1 5-4 8-10 9z' fill='%239CC46B'/%3E%3C/svg%3E">
+<script>
+  // Apply a saved light/dark choice before first paint.
+  try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Geist+Mono:wght@400..500&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&display=swap">
+<style>
+/* Same system as the super-resolution page: mono section labels in a narrow left column, serif headings. Green, after the paddies in Fig. 1, is the only accent. */
+:root {
+  --bg: #F7F6F2;
+  --surface: #FFFFFF;
+  --ink: #141619;
+  --soft: #575D64;
+  --faint: #8A9097;
+  --line: #E3E1DA;
+  --accent: #3F6A1E;
+  --tint: #EEF2E4;
+
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --sans: "Geist", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --radius: 10px;
+  --wrap: 1180px;
+  --gutter: 20px;
+  color-scheme: light;
+  --knob-x: 0px; --sun: block; --moon: none;
+}
+:root[data-theme="dark"] {
+    --bg: #0F1012; --surface: #17191C; --ink: #ECEAE4; --soft: #A3A9B0; --faint: #6F757C;
+    --line: #2A2D31; --accent: #9CC46B; --tint: #1C2416; color-scheme: dark;
+    --knob-x: 20px; --sun: none; --moon: block;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1012; --surface: #17191C; --ink: #ECEAE4; --soft: #A3A9B0; --faint: #6F757C;
+    --line: #2A2D31; --accent: #9CC46B; --tint: #1C2416; color-scheme: dark;
+    --knob-x: 20px; --sun: none; --moon: block;
+  }
+}
+@media (min-width: 760px) { :root { --gutter: 40px; } }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 64px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.2em; text-decoration-color: var(--faint); transition: color .15s, text-decoration-color .15s; }
+@media (hover: hover) { a:hover { color: var(--accent); text-decoration-color: currentColor; } }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+::selection { background: var(--tint); }
+h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 500; }
+p { margin: 0; text-wrap: pretty; }
+button { font: inherit; color: inherit; }
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)) max(var(--gutter), env(safe-area-inset-right, 0px)); }
+.mono { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.soft { color: var(--soft); }
+.measure { max-width: 68ch; }
+.stack > * + * { margin-top: 1em; }
+
+/* Nav */
+.nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: saturate(1.4) blur(10px); -webkit-backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 24px; height: 52px; }
+.nav-title { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
+.nav ul { display: flex; align-self: stretch; align-items: center; gap: 4px; margin: 0 0 0 auto; padding: 0; list-style: none; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.nav ul::-webkit-scrollbar { display: none; }
+.nav li a { display: block; padding: 6px 10px; border-radius: 6px; font-size: 0.875rem; color: var(--soft); text-decoration: none; white-space: nowrap; }
+.nav li a[aria-current="true"] { color: var(--ink); background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
+@media (max-width: 640px) { .nav-title { display: none; } .nav ul { margin-left: -10px; } .nav .wrap { gap: 12px; } }
+.theme { flex: none; position: relative; width: 46px; height: 26px; padding: 0; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; transition: transform 160ms var(--ease-out); }
+.theme:active { transform: scale(0.96); }
+.theme-knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; transform: translateX(var(--knob-x)); transition: transform 220ms var(--ease-out); }
+.theme svg { grid-area: 1 / 1; width: 12px; height: 12px; }
+.theme .sun { display: var(--sun); }
+.theme .moon { display: var(--moon); }
+@media (prefers-reduced-motion: reduce) { .theme-knob { transition: none; } }
+
+/* Hero */
+/* Narrow screens stack title, map, text. Wide screens put title and text in the left column, centred as one block beside the map. */
+.hero { padding-block: 48px 72px; }
+.hero-grid { display: grid; gap: 32px; }
+@media (min-width: 980px) {
+  .hero-grid { grid-template-columns: 6fr 5fr; grid-template-areas: "title fig" "text fig"; gap: 0 56px; }
+  .hero-title { grid-area: title; align-self: end; }
+  .hero-fig { grid-area: fig; align-self: center; }
+  .hero-text { grid-area: text; align-self: start; padding-top: 24px; }
+}
+h1 { font-family: var(--serif); font-size: clamp(2.5rem, 5.4vw, 4.1rem); line-height: 1.02; letter-spacing: -0.02em; font-variation-settings: "opsz" 72; }
+.subtitle { font-family: var(--serif); font-style: italic; font-size: clamp(1.25rem, 2.2vw, 1.5rem); line-height: 1.3; color: var(--soft); margin-top: 14px; }
+.authors { margin: 28px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 1rem; }
+.orgs { margin-top: 8px; font-size: 0.875rem; color: var(--soft); }
+.lede { font-size: 1.125rem; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 0.9375rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease-out), border-color .15s, color .15s; }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.btn:active { transform: scale(0.97); }
+@media (hover: hover) { .btn:hover { border-color: var(--ink); color: var(--ink); } }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+@media (hover: hover) { .btn.primary:hover { color: var(--bg); background: color-mix(in srgb, var(--ink) 86%, var(--bg)); } }
+figcaption, .caption { font-size: 0.875rem; line-height: 1.5; color: var(--soft); }
+figure { margin: 0; }
+figure figcaption { margin-top: 12px; }
+
+/* The article is CC BY-NC-ND, so its figures are shown exactly as published, on white, in both themes. */
+.paper-fig { background: #fff; border-radius: var(--radius); padding: clamp(10px, 2.5vw, 24px); border: 1px solid var(--line); }
+
+/* Key numbers */
+/* Each stat is value, label, context. Subgrid lines those three rows up across the strip whatever the label lengths. */
+.numbers { display: grid; grid-template-columns: 1fr; border-bottom: 1px solid var(--line); }
+.numbers > div { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 10px; padding: 24px 0; border-top: 1px solid var(--line); }
+@media (min-width: 480px) and (max-width: 899px) {
+  .numbers { grid-template-columns: 1fr 1fr; }
+  .numbers > div:nth-child(odd) { padding-right: 20px; }
+  .numbers > div:nth-child(even) { padding-left: 20px; border-left: 1px solid var(--line); }
+}
+@media (min-width: 900px) {
+  .numbers { grid-template-columns: repeat(4, 1fr); }
+  .numbers > div { padding: 28px 24px; }
+  .numbers > div + div { border-left: 1px solid var(--line); }
+  .numbers > div:first-child { padding-left: 0; }
+  .numbers > div:last-child { padding-right: 0; }
+}
+.numbers b { font-family: var(--serif); font-weight: 500; font-size: clamp(2rem, 3.4vw, 2.6rem); line-height: 1; letter-spacing: -0.015em; white-space: nowrap; font-variant-numeric: lining-nums tabular-nums; }
+.numbers b i { font: 500 0.875rem/1 var(--sans); letter-spacing: 0; color: var(--soft); margin-left: 6px; }
+.numbers > div > span { align-self: start; font-size: 0.9375rem; line-height: 1.45; text-wrap: balance; }
+.numbers small { align-self: start; font-family: var(--mono); font-size: 0.75rem; line-height: 1.5; color: var(--soft); }
+
+/* Sections */
+section { padding-block: 88px; }
+section + section { border-top: 1px solid var(--line); }
+.head { display: grid; gap: 14px; margin-bottom: 40px; }
+@media (min-width: 980px) { .head { grid-template-columns: 3fr 9fr; gap: 40px; } .head .label { padding-top: 12px; } .indent { margin-left: calc(25% + 30px); } }
+.label { color: var(--accent); font-weight: 400; line-height: 1.65; }
+h2 { font-family: var(--serif); font-size: clamp(1.9rem, 3.4vw, 2.6rem); line-height: 1.1; letter-spacing: -0.015em; }
+.head p, .head .label { margin-top: 16px; color: var(--soft); font-size: 1.0625rem; }
+h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.005em; }
+.abstract { font-family: var(--serif); font-size: 1.1875rem; line-height: 1.6; font-variation-settings: "opsz" 16; }
+/* Grid items default to min-width: auto and would stretch to a wide table instead of letting it scroll. */
+.hero-grid > *, .head > *, .results-grid > *, .iv-grid > *, .iv-side > * { min-width: 0; }
+
+/* Findings */
+.findings { display: grid; gap: 16px; margin: 0 0 64px; padding: 0; list-style: none; counter-reset: finding; }
+@media (min-width: 900px) { .findings { grid-template-columns: repeat(3, 1fr); } }
+.findings li { counter-increment: finding; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+.findings li::before { content: counter(finding, decimal-leading-zero); font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.04em; color: var(--accent); }
+.findings h3 { margin-top: 10px; font-family: var(--serif); font-size: 1.375rem; font-weight: 500; line-height: 1.25; }
+.findings p { margin-top: 10px; color: var(--soft); font-size: 1rem; }
+
+/* Tables */
+.results-grid { display: grid; gap: 56px; }
+@media (min-width: 980px) { .results-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+.table-wrap { overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); margin-top: 16px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 11px 14px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+th:last-child, td:last-child { padding-right: 0; }
+thead th { white-space: normal; font-family: var(--mono); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--soft); border-bottom-color: var(--ink); vertical-align: bottom; }
+td.se { color: var(--soft); }
+td.text { text-align: left; white-space: normal; }
+/* Labels wrap so tables fit a phone; the numbers never do. */
+td:first-child { white-space: normal; }
+@media (max-width: 479px) { th, td { padding-inline: 8px; } }
+tr.key td { background: var(--tint); }
+tr.key td:first-child { padding-left: 10px; }
+tr.key td:last-child { padding-right: 10px; }
+td strong { color: var(--accent); font-weight: 600; }
+.table-note { margin-top: 14px; }
+
+/* Haze */
+.iv-grid { display: grid; gap: 40px; }
+@media (min-width: 900px) { .iv-grid { grid-template-columns: 5fr 7fr; align-items: start; } }
+.iv-side { display: grid; gap: 48px; }
+
+/* Data and caveats */
+.caveats { margin: 16px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.caveats li { padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--soft); font-size: 1rem; }
+.method-grid { display: grid; gap: 48px; margin-top: 64px; }
+@media (min-width: 900px) { .method-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+.method-grid > * { min-width: 0; }
+.method-grid h3 + p { margin-top: 12px; }
+
+/* Citation */
+.bib { position: relative; }
+.bib pre { margin: 0; padding: 20px 22px; overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); font: 0.8125rem/1.7 var(--mono); }
+.bib .btn { position: absolute; top: 10px; right: 10px; height: 32px; padding: 0 12px; font-size: 0.8125rem; }
+.related { margin-top: 32px; }
+.related h3 { font-size: 1rem; margin-bottom: 8px; }
+
+/* Touch screens get 44px hit areas without changing how the controls look. */
+@media (pointer: coarse) {
+  .nav li a, .btn { position: relative; }
+  .theme::after, .nav li a::after, .btn::after { content: ""; position: absolute; top: 50%; left: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
+}
+
+footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font-size: 0.875rem; color: var(--soft); }
+footer .wrap { display: grid; gap: 8px; }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a class="nav-title" href="#top">Rice and PM2.5</a>
+    <ul>
+      <li><a href="#findings">Findings</a></li>
+      <li><a href="#haze">Haze</a></li>
+      <li><a href="#data">Data</a></li>
+      <li><a href="#cite">Cite</a></li>
+    </ul>
+    <button type="button" class="theme" id="theme" role="switch" aria-checked="false" aria-label="Dark mode" title="Dark mode">
+      <span class="theme-knob" aria-hidden="true">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg>
+      </span>
+    </button>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-title">
+      <h1>Air pollution and rice crop health</h1>
+      <p class="subtitle">Evidence from Vietnam&rsquo;s Mekong Delta</p>
+      <ul class="authors" aria-label="Authors">
+        <li>Eugenia Go</li>
+        <li>Yohan Iddawela</li>
+        <li>Son Le</li>
+        <li>Elaine S. Tan</li>
+      </ul>
+      <p class="orgs">Asian Development Bank &middot; <i>Scientific Reports</i> 16, 34813 (2026)</p>
+    </div>
+
+    <figure class="hero-fig">
+      <div class="paper-fig"><img src="img/fig1-study-area.webp" width="1304" height="1109" fetchpriority="high" alt="Map of the Mekong Delta with the rice-growing areas studied shaded in three greens by the number of crop cycles a year, one to three."></div>
+      <figcaption>Rice-growing areas studied, shaded by crop cycles a year. Fig.&nbsp;1 of the paper.</figcaption>
+    </figure>
+
+    <div class="hero-text">
+      <p class="lede">Satellite data on 1.1 million rice plots show crop health declining once fine-particle pollution passes about 16.5&nbsp;&micro;g/m&sup3;, just below the delta&rsquo;s average. Haze blown in from fires in neighbouring countries points the same way.</p>
+      <div class="links">
+        <a class="btn primary" href="https://www.nature.com/articles/s41598-026-75454-8" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+          Paper
+        </a>
+        <a class="btn" href="https://www.nature.com/articles/s41598-026-75454-8.pdf" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+          PDF
+        </a>
+        <a class="btn" href="https://doi.org/10.5281/zenodo.23120338" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>
+          Code
+        </a>
+        <a class="btn" href="#cite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 7h4v4c0 3-1.5 5-4 6M14 7h4v4c0 3-1.5 5-4 6"/></svg>
+          BibTeX
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="numbers">
+    <div><b>16.5<i>&micro;g/m&sup3;</i></b><span>PM2.5 level where rice health starts to decline</span><small>Delta average: 18.5</small></div>
+    <div><b>1.1M</b><span>One-hectare rice plots followed through the reproductive stage</span><small>10.75M plot-months, 2017 to 2022</small></div>
+    <div><b>5.5%</b><span>More PM2.5 in the delta for 10% more fire activity abroad</span><small>48 fire regions in neighbouring countries</small></div>
+    <div><b>&minus;0.016</b><span>Change in NDVI for 10% more haze-driven PM2.5</span><small>Mean NDVI 0.28; p&nbsp;&lt;&nbsp;0.10</small></div>
+  </div>
+</div>
+
+<section id="abstract">
+  <div class="wrap">
+    <div class="head">
+      <h2 class="label mono">Abstract</h2>
+      <div class="abstract measure">
+        <p>Ambient air pollution is a growing concern in Southeast Asia, yet its effects on crop performance remain less understood than its effects on human health. Here, we examine whether fine particulate matter (PM2.5) exposure is associated with rice crop health in Vietnam&rsquo;s Mekong Delta, a major global rice-producing region. Our main contribution lies in developing a scalable methodology for data-scarce settings using remote-sensing indicators of crop condition with satellite-derived PM2.5, weather data, night-time lights, and fire activity from 2017 to 2022. Panel fixed effects estimates suggest a non-linear relationship between PM2.5 and crop health during the reproductive stage, with damages starting at 16.5&nbsp;&micro;g/m&sup3;, below the average levels of concentration in the area. The negative impacts of PM2.5 are consistent with the reduction of fraction of photosynthetically active radiation. To address potential endogeneity in local pollution exposure, we instrument PM2.5 using episodic transboundary fire activity outside the Mekong Delta. The instrumental variable estimates also indicate a negative effect of haze-related pollution on crop condition. Together, these findings suggest that air pollution could impose agricultural costs in major rice producing areas, and should be considered in regional food-security and environmental policy discussions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="findings">
+  <div class="wrap">
+    <div class="head">
+      <p class="label mono">01 &middot; Findings</p>
+      <div class="measure">
+        <h2>Rice health peaks, then falls as pollution rises</h2>
+        <p>The panel follows each plot through panicle formation, pollination and grain filling, the stage most sensitive to pollution. Plot-by-month and plot-by-year fixed effects absorb each plot&rsquo;s fixed traits, its usual seasonal pattern and its yearly trend, so every estimate compares a plot with itself.</p>
+      </div>
+    </div>
+
+    <ol class="findings">
+      <li>
+        <h3>A turning point at 16.5&nbsp;&micro;g/m&sup3;</h3>
+        <p>NDVI, a satellite measure of crop greenness, rises with PM2.5 at low levels, possibly because haze scatters sunlight deeper into the canopy. Past 16.5&nbsp;&micro;g/m&sup3; it falls. A piecewise fit puts the damage between 15 and 30&nbsp;&micro;g/m&sup3;; above 30 the extra effect is indistinguishable from zero.</p>
+      </li>
+      <li>
+        <h3>Less sunlight used for photosynthesis</h3>
+        <p>fPAR, the share of usable sunlight the canopy absorbs, follows the same curve and turns at 20.3&nbsp;&micro;g/m&sup3;. That fits a direct plant response, though it cannot rule out farmers changing what they do on hazy days. Water stress turns only beyond the highest level the delta saw.</p>
+      </li>
+      <li>
+        <h3>Haze from abroad gives the same answer</h3>
+        <p>Smoke from fires outside Vietnam raises PM2.5 in the delta for reasons unrelated to its farms. Using it as an instrument, 10% more haze-driven PM2.5 lowers NDVI by about 0.016, significant at the 10% level, and lowers fPAR with high confidence.</p>
+      </li>
+    </ol>
+
+    <div class="results-grid">
+      <div>
+        <h3>Where the turning point lands</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Outcome and sample</th><th>Turning point, &micro;g/m&sup3;</th></tr></thead>
+            <tbody>
+              <tr class="key"><td>NDVI, main specification</td><td><strong>16.5</strong></td></tr>
+              <tr><td>NDVI, no weather controls</td><td>12.4</td></tr>
+              <tr><td>fPAR, sunlight absorbed</td><td>20.3</td></tr>
+              <tr><td>Radar vegetation index</td><td>26.1</td></tr>
+              <tr><td>NDVI, Dong Thap included</td><td>32.2</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption table-note">From the quadratic fit in log PM2.5. The delta averages 18.5&nbsp;&micro;g/m&sup3;, with a range of 2.5 to 81.7. Tables 2 and 3, Supplementary Tables A1 and A5.</p>
+      </div>
+
+      <div>
+        <h3>Effect of PM2.5 on NDVI by pollution band</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>PM2.5 band, &micro;g/m&sup3;</th><th>Estimate</th><th>SE</th></tr></thead>
+            <tbody>
+              <tr><td>Below 15</td><td>0.0041</td><td class="se">(0.0030)</td></tr>
+              <tr class="key"><td>15 to 30</td><td><strong>&minus;0.0069**</strong></td><td class="se">(0.0030)</td></tr>
+              <tr><td>30 to 50</td><td>0.0023</td><td class="se">(0.0035)</td></tr>
+              <tr><td>Above 50</td><td>0.0002</td><td class="se">(0.0041)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption table-note">Piecewise-linear fit, Table 2 column 6, with standard errors clustered on the 44&nbsp;km PM2.5 grid. ** p&nbsp;&lt;&nbsp;0.05.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="haze">
+  <div class="wrap">
+    <div class="head">
+      <p class="label mono">02 &middot; Transboundary haze</p>
+      <div class="measure">
+        <h2>Fires abroad, haze in the delta</h2>
+        <p>Local pollution could track local conditions that also affect crops. So the second analysis uses pollution the delta does not make. Fire detections from 418 regions in seven neighbouring countries count only in months when the wind blows from them toward the delta, weighted by inverse squared distance. An elastic net keeps the 48 regions that predict the delta&rsquo;s PM2.5.</p>
+      </div>
+    </div>
+
+    <div class="iv-grid">
+      <figure>
+        <div class="paper-fig"><img src="img/fig2-fire-regions.webp" width="825" height="1086" loading="lazy" alt="Map of Southeast Asia with administrative regions outlined. Some regions are shaded red, in mainland Southeast Asia, peninsular Malaysia, Borneo, Sumatra and Java."></div>
+        <figcaption>Biomass burning in neighbouring regions used as the instrument. Fig.&nbsp;2 of the paper.</figcaption>
+      </figure>
+
+      <div class="iv-side">
+        <figure>
+          <div class="paper-fig"><img src="img/fig3-fire-pm25.webp" width="1298" height="778" loading="lazy" alt="Monthly series from 2017 to 2022. Average fire brightness temperature, in red, spikes once a year, and log PM2.5 in the delta, dotted blue, tends to rise with it."></div>
+          <figcaption>Fire activity in those regions (red) and log PM2.5 in the delta (dotted), by month. Fire is zero in upwind months by construction. Fig.&nbsp;3 of the paper.</figcaption>
+        </figure>
+
+        <div>
+          <h3>Instrumental-variable estimates</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Outcome</th><th>Estimate</th><th>SE</th><th>AR p</th></tr></thead>
+              <tbody>
+                <tr class="key"><td>NDVI</td><td><strong>&minus;0.169*</strong></td><td class="se">(0.084)</td><td>0.026</td></tr>
+                <tr><td>Radar vegetation index</td><td>&minus;0.101*</td><td class="se">(0.058)</td><td>0.058</td></tr>
+                <tr><td>fPAR</td><td><strong>&minus;0.485***</strong></td><td class="se">(0.105)</td><td>&lt;&nbsp;0.001</td></tr>
+                <tr><td>Water stress (ESI)</td><td>&minus;1.134</td><td class="se">(0.898)</td><td>0.097</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="caption table-note stack">
+            <p>Effect of log PM2.5 on each outcome, by two-stage least squares on 35 PM2.5 grid cells of 44&nbsp;km: 562 grid-months, 535 for fPAR and ESI. First stage: 0.551*** (0.127), Kleibergen-Paap F 18.96, or 16.78 for fPAR and ESI. AR p is the Anderson-Rubin weak-instrument test, wild-bootstrapped at 44&nbsp;km. Table 4. * p&nbsp;&lt;&nbsp;0.10, *** p&nbsp;&lt;&nbsp;0.01.</p>
+            <p>As a placebo, fires from the same regions in upwind months give estimates indistinguishable from zero (Supplementary Table A3).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="data">
+  <div class="wrap">
+    <div class="head">
+      <p class="label mono">03 &middot; Data and method</p>
+      <div class="measure">
+        <h2>Ten open datasets on one 100&nbsp;m grid</h2>
+        <p>Every source is free to use. All are resampled to a common 100&nbsp;m grid. PM2.5 keeps its coarse 44&nbsp;km structure, so neighbouring cells are far from independent, and every result is also tested with errors clustered at 44&nbsp;km.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Measure</th><th style="text-align:left">Source</th><th>Native resolution</th></tr></thead>
+        <tbody>
+          <tr><td>Crop health (NDVI)</td><td class="text">Sentinel-2</td><td>10 m</td></tr>
+          <tr><td>Crop health, radar (RVI)</td><td class="text">Sentinel-1</td><td>&ndash;</td></tr>
+          <tr><td>Rice areas</td><td class="text">JAXA high-resolution land use and land cover</td><td>10 m</td></tr>
+          <tr><td>Growth stage</td><td class="text">Rice crop calendar of Zhao et al.</td><td>~55 km</td></tr>
+          <tr><td>PM2.5</td><td class="text">Copernicus Atmosphere Monitoring Service</td><td>44 km</td></tr>
+          <tr><td>Rain, temperature, humidity</td><td class="text">ERA5-Land reanalysis</td><td>~11 km</td></tr>
+          <tr><td>Local economy</td><td class="text">NASA VIIRS Black Marble night-time lights</td><td>~500 m</td></tr>
+          <tr><td>Sunlight absorbed (fPAR)</td><td class="text">MODIS</td><td>500 m</td></tr>
+          <tr><td>Water stress (ESI)</td><td class="text">NASA-NOAA Evaporative Stress Index</td><td>4 km</td></tr>
+          <tr><td>Fires</td><td class="text">NASA FIRMS, MODIS brightness temperature</td><td>~1 km</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="method-grid">
+      <div>
+        <h3>Model</h3>
+        <p class="soft">The main model regresses a plot&rsquo;s NDVI on log PM2.5 and its square, with rain, temperature, humidity and the previous month&rsquo;s night-time lights as controls, all in logs. Plot-by-month and plot-by-year fixed effects remove what is constant about a plot, its seasonal cycle and its yearly trend. Standard errors are clustered at 100&nbsp;m and, as the stricter test, wild-bootstrapped at 44&nbsp;km. Data processing is in Python and estimation in Stata.</p>
+      </div>
+      <div>
+        <h3>What the estimates do not show</h3>
+        <ul class="caveats">
+          <li>Satellite indices stand in for crop health and yield; they are not field measurements.</li>
+          <li>Fertiliser, labour and irrigation are not observed, so farmers&rsquo; responses to haze cannot be ruled out.</li>
+          <li>Ozone is not observed, so the haze estimates cover biomass-burning pollution as a whole.</li>
+          <li>Dong Thap province is left out because its plots behave unlike the rest of the delta, possibly because of the Tram Chim wetland and the deep-flooding Plain of Reeds. With them, the turning point moves to 32.2&nbsp;&micro;g/m&sup3;.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cite">
+  <div class="wrap">
+    <div class="head">
+      <p class="label mono">04 &middot; Citation</p>
+      <div class="measure"><h2>Cite this work</h2></div>
+    </div>
+    <div class="indent">
+      <div class="bib">
+        <pre id="bibtex">@article{go2026air,
+  title   = {Air pollution and rice crop health: evidence
+             from {Vietnam's} {Mekong} {Delta}},
+  author  = {Go, Eugenia and Iddawela, Yohan and Le, Son
+             and Tan, Elaine S.},
+  journal = {Scientific Reports},
+  volume  = {16},
+  pages   = {34813},
+  year    = {2026},
+  doi     = {10.1038/s41598-026-75454-8}
+}</pre>
+        <button type="button" class="btn" id="copy-bib">Copy</button>
+      </div>
+      <div class="related">
+        <h3>Code</h3>
+        <p class="soft">Data extraction pipelines and analysis code: <a href="https://doi.org/10.5281/zenodo.23120338" target="_blank" rel="noopener">doi.org/10.5281/zenodo.23120338</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Figures 1 to 3 are reproduced unchanged from the article, &copy; the authors, under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener">CC BY-NC-ND 4.0</a>. Administrative boundaries in Figs.&nbsp;1 and 2 are from GADM 4.1.</p>
+  </div>
+</footer>
+
+<script>
+// Light/dark switch. Without a saved choice the page follows the system setting.
+(() => {
+  const btn = document.getElementById('theme');
+  const root = document.documentElement;
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : system.matches;
+  const sync = () => btn.setAttribute('aria-checked', String(isDark()));
+  btn.addEventListener('click', () => {
+    const next = isDark() ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch (e) {}
+    sync();
+  });
+  system.addEventListener('change', sync);
+  sync();
+})();
+
+// BibTeX copy
+(() => {
+  const btn = document.getElementById('copy-bib');
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById('bibtex').textContent);
+      btn.textContent = 'Copied';
+    } catch (e) {
+      btn.textContent = 'Select and copy';
+    }
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1600);
+  });
+})();
+
+// Highlight the nav link for the section in view.
+(() => {
+  const links = new Map([...document.querySelectorAll('.nav li a')].map(a => [a.hash.slice(1), a]));
+  const seen = new Map();
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => seen.set(e.target.id, e.isIntersecting));
+    const active = [...links.keys()].find(id => seen.get(id));
+    links.forEach((a, id) => a.setAttribute('aria-current', String(id === active)));
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  links.forEach((_, id) => { const s = document.getElementById(id); if (s) obs.observe(s); });
+})();
+</script>
+</body>
+</html>
