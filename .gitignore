@@ -1,2 +1,5 @@
 .DS_Store
 __pycache__/
+# Downloads and intermediate SVGs from the build scripts in tools/.
+tools/.cache/
+tools/*/*.svg
