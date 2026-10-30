@@ -178,6 +178,7 @@ h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.005em; }
 @font-face { font-family: "CMU"; src: url("fonts/katex/KaTeX_Main-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "CMU"; src: url("fonts/katex/KaTeX_Main-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
 @font-face { font-family: "CMU"; src: url("fonts/katex/KaTeX_Main-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "CMU Math"; src: url("fonts/katex/KaTeX_Math-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
 @font-face { font-family: "CMU"; src: url("fonts/katex/KaTeX_Main-BoldItalic.woff2") format("woff2"); font-weight: 700; font-style: italic; font-display: swap; }
 :root { --d-ink: #2F3133; --d-soft: #5C6166; --d-line: #6E7276; --d-fill: #EEEEEC; --d-yellow: #F6E3A2; --d-green: #CDE1B3; --d-blue: #BACBF0; --d-frame: #D2D0C9; }
 :root[data-theme="dark"] { --d-ink: #E8E5DE; --d-soft: #A7ACB2; --d-line: #9AA0A6; --d-fill: #24272B; --d-yellow: #5A4C1F; --d-green: #33462A; --d-blue: #2C3B5E; --d-frame: #3A3E43; }
@@ -191,6 +192,13 @@ h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.005em; }
 .dg .box { fill: var(--d-fill); stroke: var(--d-line); stroke-width: 1.3; }
 .dg .box.yellow { fill: var(--d-yellow); stroke: var(--d-ink); }
 .dg .box.green { fill: var(--d-green); stroke: var(--d-ink); }
+.dg .box.blue { fill: var(--d-blue); stroke: var(--d-ink); }
+.dg .mi { font-family: "CMU Math", var(--cm); font-style: italic; }
+.dg .mn { font-family: var(--cm); font-style: normal; }
+.dg .badge-disc { fill: var(--d-ink); }
+.dg .badge-glyph { fill: var(--bg); }
+.dg .badge-glyph text { fill: var(--bg); }
+.dg .badge-line { fill: none; stroke: var(--bg); stroke-width: 2.2; stroke-linecap: round; }
 .dg .guide { stroke: var(--d-soft); stroke-width: 1; }
 .dg .guide.dash { stroke-dasharray: 4 4; }
 .dg .guide.key { stroke: var(--d-ink); stroke-width: 1.6; }
@@ -329,13 +337,20 @@ td strong { color: var(--accent); font-weight: 600; }
 .iv-grid { display: grid; gap: 48px; }
 @media (min-width: 900px) { .iv-grid { grid-template-columns: 4fr 8fr; gap: 56px; align-items: start; } }
 
-/* Data and caveats */
-.caveats { margin: 16px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
-.caveats li { padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--soft); font-size: 1rem; }
-.method-grid { display: grid; gap: 48px; margin-top: 64px; }
-@media (min-width: 900px) { .method-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
-.method-grid > * { min-width: 0; }
-.method-grid h3 + p { margin-top: 12px; }
+/* Model figure */
+.model-fig { margin-top: 72px; }
+.model-fig figcaption { margin-top: 14px; max-width: 72ch; }
+/* Limits: one bold band, so the caveats are hard to miss. */
+.limits { margin-top: 64px; padding: 26px clamp(20px, 3vw, 36px) 30px; background: var(--d-yellow); border-top: 3px solid var(--ink); border-radius: 0 0 var(--radius) var(--radius); color: var(--ink); }
+.limits-head { display: flex; align-items: center; gap: 14px; }
+.limits .badge { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; font: 700 1.25rem/1 var(--cm); }
+.limits h3 { font-size: clamp(1.4rem, 2.6vw, 1.9rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+.limits ol { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 22px 28px; counter-reset: lim; }
+@media (min-width: 700px) { .limits ol { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .limits ol { grid-template-columns: repeat(5, 1fr); } }
+.limits li { counter-increment: lim; padding-top: 12px; border-top: 1px solid color-mix(in srgb, var(--ink) 28%, transparent); font-size: 0.9375rem; line-height: 1.55; }
+.limits li::before { content: counter(lim, decimal-leading-zero); display: block; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.04em; }
+.limits li b { display: block; margin: 6px 0 4px; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
 
 /* Citation */
 .bib { position: relative; }
@@ -627,22 +642,21 @@ footer .wrap { display: grid; gap: 8px; }
       </table>
     </div>
 
-    <div class="method-grid">
-      <div>
-        <h3>Model</h3>
-        <p class="soft">The main model regresses a plot&rsquo;s NDVI on log PM2.5 and its square, with rain, temperature, humidity and the previous month&rsquo;s night-time lights as controls, all in logs. Plot-by-month and plot-by-year fixed effects remove what is constant about a plot, its seasonal cycle and its yearly trend. Standard errors are clustered at 100&nbsp;m and, as the stricter test, wild-bootstrapped at 44&nbsp;km. Data processing is in Python and estimation in Stata.</p>
-      </div>
-      <div>
-        <h3>What the estimates do not show</h3>
-        <ul class="caveats">
-          <li>Satellite indices stand in for crop health and yield; they are not field measurements.</li>
-          <li>Fertiliser, labour and irrigation are not observed, so farmers&rsquo; responses to haze cannot be ruled out.</li>
-          <li>Ozone is not observed, so the haze estimates cover biomass-burning pollution as a whole.</li>
-          <li>The study predates the restructuring of Vietnam&rsquo;s administrative divisions that took effect on 1 July 2025. Provinces, Dong Thap among them, are named and bounded as they were before it.</li>
-          <li>Dong Thap province is left out because its plots behave unlike the rest of the delta, possibly because of the Tram Chim wetland and the deep-flooding Plain of Reeds. With them, the turning point moves to 32.2&nbsp;&micro;g/m&sup3;.</li>
-        </ul>
-      </div>
-    </div>
+    <figure class="model-fig" id="model-fig">
+      <svg class="dg" role="img" aria-labelledby="model-title model-desc"><title id="model-title">The two models behind the estimates</title><desc id="model-desc">Panel a, panel fixed effects: PM2.5, weather and the previous month&rsquo;s night-time lights, with plot-by-month and plot-by-year fixed effects, explain NDVI through the equation NDVI equals beta one times log PM2.5 plus beta two times log PM2.5 squared plus controls and fixed effects. The fitted curve rises then falls, turning at 16.5 micrograms per cubic metre. Panel b, instrumental variables: fires in 48 regions abroad predict PM2.5 in the delta, first stage 0.551 with F of 19, and predicted PM2.5 lowers NDVI, second stage minus 0.169.</desc></svg>
+      <figcaption>Equations 1 to 3 of the paper. In (a), standard errors are clustered at 100&nbsp;m and, as the stricter test, wild-bootstrapped at 44&nbsp;km; the curve is a sketch of the fitted shape. In (b), the instrument is fire brightness in the 48 regions, counted only in downwind months and weighted by inverse squared distance. Data processing is in Python and estimation in Stata.</figcaption>
+    </figure>
+
+    <aside class="limits" aria-labelledby="limits-title">
+      <div class="limits-head"><span class="badge" aria-hidden="true">!</span><h3 id="limits-title">What the estimates do not show</h3></div>
+      <ol>
+        <li><b>Crop health, not harvests.</b> Satellite indices stand in for crop health and yield; they are not field measurements.</li>
+        <li><b>Farmers&rsquo; choices unseen.</b> Fertiliser, labour and irrigation are not observed, so farmers&rsquo; responses to haze cannot be ruled out.</li>
+        <li><b>Ozone not measured.</b> The haze estimates cover biomass-burning pollution as a whole, not PM2.5 alone.</li>
+        <li><b>Pre-2025 provinces.</b> The study predates the restructuring of Vietnam&rsquo;s administrative divisions that took effect on 1 July 2025. Provinces, Dong Thap among them, are named and bounded as they were before it.</li>
+        <li><b>Dong Thap left out.</b> Its plots behave unlike the rest of the delta, possibly because of the Tram Chim wetland and the deep-flooding Plain of Reeds. With them, the turning point moves to 32.2&nbsp;&micro;g/m&sup3;.</li>
+      </ol>
+    </aside>
   </div>
 </section>
 
@@ -728,6 +742,43 @@ function drawWhenSized(svg, draw) {
   new ResizeObserver(run).observe(svg);
   document.fonts.ready.then(() => { last = 0; run(); });
 }
+// Icon badges, like the reference figure's: a dark disc with a light glyph. Each marks where a quantity comes from.
+const ICON = {
+  satellite: ['measured by satellite', g => {
+    const s = el('g', { transform: 'rotate(45 12 12)' }, g);
+    el('rect', { x: 9.6, y: 8.6, width: 4.8, height: 6.8, rx: 1 }, s);
+    el('rect', { x: 2.6, y: 10, width: 5.6, height: 4, rx: 0.6 }, s);
+    el('rect', { x: 15.8, y: 10, width: 5.6, height: 4, rx: 0.6 }, s);
+  }],
+  model: ['from an atmospheric model', g => el('path', { d: 'M7.4 17.6h9.4a3.6 3.6 0 0 0 .3-7.2 5.1 5.1 0 0 0-9.8 1.3 3 3 0 0 0 .1 5.9z' }, g)],
+  fixed: ['absorbed by fixed effects', g => {
+    el('rect', { x: 6.8, y: 11, width: 10.4, height: 8, rx: 1.6 }, g);
+    el('path', { d: 'M9.2 11V8.7a2.8 2.8 0 0 1 5.6 0V11', class: 'badge-line' }, g);
+  }],
+  estimate: ['estimated in the paper', g => el('text', { x: 12, y: 17, 'text-anchor': 'middle', 'font-size': 15, class: 'mi' }, g, 'β')],
+};
+function badge(parent, cx, cy, kind, r = 12) {
+  el('circle', { cx, cy, r, class: 'badge-disc' }, parent);
+  const k = r / 12;
+  ICON[kind][1](el('g', { class: 'badge-glyph', transform: `translate(${cx - 12 * k},${cy - 12 * k}) scale(${k})` }, parent));
+}
+// Framed legend of icon badges, wrapping onto more rows when narrow; returns its height.
+function iconLegend(parent, x, y, w, kinds, size) {
+  const g = el('g', { 'font-size': size }, parent);
+  let lx = x + 16, row = 0;
+  kinds.forEach(kind => {
+    const label = ICON[kind][0];
+    const probe = el('text', { x: 0, y: -100 }, g, label), tw = probe.getComputedTextLength(); probe.remove();
+    if (lx + 30 + tw > x + w - 12 && lx > x + 16) { row++; lx = x + 16; }
+    const cy = y + 21 + row * 30;
+    badge(g, lx + 11, cy, kind, 11);
+    el('text', { x: lx + 28, y: cy + 4.5 }, g, label);
+    lx += 28 + tw + 26;
+  });
+  const h = 42 + row * 30;
+  g.insertBefore(el('rect', { x: x + 1, y, width: w - 2, height: h, rx: 10, class: 'frame' }), g.firstChild);
+  return h;
+}
 
 // Findings: where crop damage starts.
 drawWhenSized(document.querySelector('#damage-fig svg'), (svg, W) => {
@@ -740,10 +791,14 @@ drawWhenSized(document.querySelector('#damage-fig svg'), (svg, W) => {
   const lanes = el('g', {}, g);
   // Lane labels: a column on the left when wide, a line above each lane when narrow.
   let y = 0;
-  function lane(title, note, height) {
-    if (narrow) { backdrop(runs(lanes, 0, y + 13, [[title, 'b'], [`  ${note}`, 'i']])); y += 22; }
-    else {
-      runs(lanes, 0, y + height / 2 - 3, [[title, 'b']]);
+  function lane(title, note, height, icon) {
+    if (narrow) {
+      const t = backdrop(runs(lanes, 0, y + 13, [[title, 'b'], [`  ${note}`, 'i']]));
+      if (icon) badge(lanes, t.getComputedTextLength() + 16, y + 8, icon, 9);
+      y += 22;
+    } else {
+      const t = runs(lanes, 0, y + height / 2 - 3, [[title, 'b']]);
+      if (icon) badge(lanes, t.getComputedTextLength() + 16, y + height / 2 - 8, icon, 10);
       runs(lanes, 0, y + height / 2 + 15, [[note, 'i']], { 'font-size': small });
     }
     const top = y; y += height + (narrow ? 18 : 22); return top;
@@ -752,13 +807,15 @@ drawWhenSized(document.querySelector('#damage-fig svg'), (svg, W) => {
   // Thresholds
   const tA = lane('Thresholds', 'µg/m³', 64);
   const tp = tagBox(g, X(16.5), tA, [['Turning point: ', 'b'], ['16.5']], 'green', W, fs);
+  badge(g, Math.min(tp.cx + tp.w / 2 + 4, W - 6), tA - 2, 'estimate', 10);
   const who = tagBox(g, X(5), tA + 36, [['WHO guideline: ', 'b'], ['5']], '', W, fs);
   const avgParts = [['Delta average: ', 'b'], ['18.5']];
   const avgProbe = runs(g, 0, -100, avgParts, { 'font-size': fs }); const avgW = avgProbe.getComputedTextLength() + 18; avgProbe.remove();
-  tagBox(g, X(18.5) + 8 + avgW / 2, tA + 36, avgParts, '', W, fs);
+  const avg = tagBox(g, X(18.5) + 8 + avgW / 2, tA + 36, avgParts, '', W, fs);
+  badge(g, Math.min(avg.cx + avg.w / 2 + 4, W - 6), tA + 34, 'model', 10);
 
   // Spline bands
-  const tB = lane('Piecewise fit', 'change in NDVI, by band', narrow ? 44 : 56);
+  const tB = lane('Piecewise fit', 'change in NDVI, by band', narrow ? 44 : 56, 'estimate');
   const bh = narrow ? 44 : 56;
   const bands = [[2.5, 15, '+0.0041', '(0.0030)', '', 9.5], [15, 30, '−0.0069**', '(0.0030)', 'yellow'], [30, 50, '+0.0023', '(0.0035)', ''], [50, 81.7, '+0.0002', '(0.0041)', '']];
   // If any not-significant number is too wide for its box, all of them say n.s., so the row reads consistently.
@@ -776,7 +833,7 @@ drawWhenSized(document.querySelector('#damage-fig svg'), (svg, W) => {
     });
 
   // Turning points across specifications
-  const tC = lane('Turning points', 'five specifications', narrow ? 46 : 58);
+  const tC = lane('Turning points', 'five specifications', narrow ? 46 : 58, 'estimate');
   const dy = tC + 10;
   el('line', { x1: X(12.4), x2: X(32.2), y1: dy, y2: dy, class: 'rule' }, g);
   [[12.4, ''], [20.3, ''], [26.1, ''], [32.2, ''], [16.5, 'green']].forEach(([v, cls]) => {
@@ -813,7 +870,7 @@ drawWhenSized(document.querySelector('#damage-fig svg'), (svg, W) => {
 
   // Legend, framed like the reference figure's.
   const ly = ay + (narrow ? 56 : 58);
-  const items = [['yellow', 'p < 0.05', 'box'], ['', 'not significant', 'box'], ['green', 'main specification', 'dot'], ['', 'other specifications', 'dot']];
+  const items = [['yellow', 'p < 0.05', 'box'], ['', 'not significant', 'box'], ['green', 'main specification', 'dot'], ['', 'other specifications', 'dot'], ['estimate', ICON.estimate[0], 'icon'], ['model', ICON.model[0], 'icon']];
   const legend = el('g', { 'font-size': small }, g);
   let lx = (narrow ? 0 : x0) + 14, row = 0;
   const rowH = 26, maxX = narrow ? W - 8 : x1;
@@ -822,6 +879,7 @@ drawWhenSized(document.querySelector('#damage-fig svg'), (svg, W) => {
     if (lx + 22 + tw > maxX - 10) { row++; lx = (narrow ? 0 : x0) + 14; }
     const cy = ly + 18 + row * rowH;
     if (kind === 'box') el('rect', { x: lx, y: cy - 7, width: 16, height: 14, rx: 3, class: `box ${cls}` }, legend);
+    else if (kind === 'icon') badge(legend, lx + 8, cy, cls, 10);
     else el('circle', { cx: lx + 8, cy, r: 5, class: `dot ${cls}` }, legend);
     el('text', { x: lx + 24, y: cy + 4.5 }, legend, label);
     lx += 24 + tw + 22;
@@ -855,7 +913,8 @@ drawWhenSized(document.querySelector('#fig3 svg'), (svg, W) => {
   // Panel A: log PM2.5
   const aTop = 30, aH = narrow ? 118 : 150, aLo = 1.5, aHi = 4;
   const YA = v => aTop + (aHi - v) / (aHi - aLo) * aH;
-  runs(g, 0, 14, [['log PM2.5: ', 'b'], ['Mekong Delta', 'i']]);
+  badge(g, 10, 9, 'model', 10);
+  runs(g, 26, 14, [['log PM2.5: ', 'b'], ['Mekong Delta', 'i']]);
   [2, 3, 4].forEach(v => {
     el('line', { x1: left, x2: right, y1: YA(v), y2: YA(v), class: 'grid' }, back);
     el('text', { x: left - 8, y: YA(v) + 4, 'text-anchor': 'end', 'font-size': small }, g, String(v));
@@ -864,7 +923,8 @@ drawWhenSized(document.querySelector('#fig3 svg'), (svg, W) => {
   // Panel B: fire activity abroad
   const bTop = aTop + aH + 52, bH = narrow ? 64 : 80, bHi = 1.4;
   const YB = v => bTop + (bHi - v) / bHi * bH;
-  runs(g, 0, bTop - 16, [['Fire activity: ', 'b'], [narrow ? '48 regions abroad' : 'average brightness, 48 regions abroad', 'i']]);
+  badge(g, 10, bTop - 21, 'satellite', 10);
+  runs(g, 26, bTop - 16, [['Fire activity: ', 'b'], [narrow ? '48 regions abroad' : 'average brightness, 48 regions abroad', 'i']]);
   [0, 1].forEach(v => {
     el('line', { x1: left, x2: right, y1: YB(v), y2: YB(v), class: 'grid' }, back);
     el('text', { x: left - 8, y: YB(v) + 4, 'text-anchor': 'end', 'font-size': small }, g, String(v));
@@ -917,8 +977,144 @@ drawWhenSized(document.querySelector('#fig3 svg'), (svg, W) => {
   svg.onkeydown = e => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); show((at ?? -1) + (e.key === 'ArrowRight' ? 1 : -1)); }
   };
-  svg.setAttribute('height', ay + 66);
-  svg.setAttribute('viewBox', `0 0 ${W} ${ay + 66}`);
+  const lh = iconLegend(g, 0, ay + 72, Math.min(W, 520), ['model', 'satellite'], small);
+  svg.setAttribute('height', ay + 76 + lh);
+  svg.setAttribute('viewBox', `0 0 ${W} ${ay + 76 + lh}`);
+});
+
+// Methods: the two models behind the estimates, drawn like the paper's figures.
+drawWhenSized(document.querySelector('#model-fig svg'), (svg, W) => {
+  const wide = W >= 900, fs = wide ? 15 : 13.5, small = wide ? 13 : 12;
+  const g = el('g', { 'font-size': fs }, svg);
+  el('defs', {}, g).innerHTML = '<marker id="model-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="rule" d="M1 1.5L9 5L1 8.5" stroke-linecap="round" stroke-linejoin="round"/></marker>';
+  // Rounded box with a bold title and an optional italic note; returns its height.
+  function box(x, y, w, title, note, cls, h = note ? 52 : 34) {
+    el('rect', { x, y, width: w, height: h, rx: 8, class: `box ${cls}` }, g);
+    runs(g, x + w / 2, y + (note ? h / 2 - 3 : h / 2 + 5), [[title, 'b']], { 'text-anchor': 'middle' });
+    if (note) runs(g, x + w / 2, y + h / 2 + 15, [[note, 'i']], { 'text-anchor': 'middle', 'font-size': small });
+    return h;
+  }
+  // A line of maths from [text, kind] tokens: 'v' italic variable, 's' subscript, 'p' superscript, '' upright.
+  function math(x, y, tokens, anchor = 'middle', size = fs + 1) {
+    const t = el('text', { x, y, 'text-anchor': anchor, 'font-size': size }, g);
+    let shift = 0;
+    tokens.forEach(([str, kind]) => {
+      const target = kind === 's' ? 0.3 * size : kind === 'p' ? -0.42 * size : 0;
+      const a = { class: kind === 'v' || kind === 's' ? 'mi' : 'mn' };
+      if (target !== shift) { a.dy = target - shift; shift = target; }
+      if (kind === 's' || kind === 'p') a['font-size'] = size * 0.7;
+      el('tspan', a, t, str);
+    });
+    return t;
+  }
+  const arrow = (x1, y1, x2, y2) => el('line', { x1, y1, x2, y2, class: 'rule', 'marker-end': 'url(#model-ah)' }, g);
+  // Hollow one-way arrow from (xa, ya) to (xb, yb), drawn like the reference figure's arrows.
+  function hollow(xa, ya, xb, yb) {
+    const len = Math.hypot(xb - xa, yb - ya), h = 10, s = 4, k = 13;
+    const pts = [[0, -s], [len - k, -s], [len - k, -h], [len, 0], [len - k, h], [len - k, s], [0, s]];
+    el('polygon', { class: 'outline-arrow', points: pts.map(p => p.join(',')).join(' '), transform: `translate(${xa},${ya}) rotate(${Math.atan2(yb - ya, xb - xa) * 180 / Math.PI})` }, g);
+  }
+  const EQ1 = [['NDVI', 'v'], ['it', 's'], [' = ', ''], ['β', 'v'], ['1', 's'], [' ln PM2.5', ''], ['it', 's'], [' + ', ''], ['β', 'v'], ['2', 's'], [' (ln PM2.5', ''], ['it', 's'], [')', ''], ['2', 'p']];
+  const EQ2 = [[' + ', ''], ['γ', 'v'], ['X', 'v'], ['it', 's'], [' + ', ''], ['ρ', 'v'], ['i,m', 's'], [' + ', ''], ['η', 'v'], ['i,y', 's'], [' + ', ''], ['ε', 'v'], ['it', 's']];
+  const TURN = [['PM', 'v'], ['*', 'p'], [' = exp(−', ''], ['β', 'v'], ['1', 's'], [' / 2', ''], ['β', 'v'], ['2', 's'], [')', '']];
+  // Sketch of the fitted shape: up, then down, with the turning point marked.
+  function curve(x0, y0, w, h) {
+    el('path', { class: 'rule', d: `M${x0},${y0}V${y0 + h}H${x0 + w}` }, g);
+    const a = [x0 + 8, y0 + h - 12], c = [x0 + w * 0.45, y0 - h * 0.55], b = [x0 + w - 6, y0 + h - 34];
+    el('path', { class: 'series', d: `M${a}Q${c} ${b}` }, g);
+    const t = (c[1] - a[1]) / ((c[1] - a[1]) - (b[1] - c[1]));
+    const px = (1 - t) ** 2 * a[0] + 2 * t * (1 - t) * c[0] + t * t * b[0], py = (1 - t) ** 2 * a[1] + 2 * t * (1 - t) * c[1] + t * t * b[1];
+    el('line', { x1: px, x2: px, y1: py, y2: y0 + h, class: 'guide dash' }, g);
+    el('circle', { cx: px, cy: py, r: 3.5, class: 'cursor-dot' }, g);
+    backdrop(runs(g, px, py - 10, [['16.5 μg/m³', 'b']], { 'text-anchor': 'middle', 'font-size': small }));
+    runs(g, x0 + w, y0 + h + 17, [['ln PM2.5', 'i']], { 'text-anchor': 'end', 'font-size': small });
+    runs(g, x0 + 6, y0 + 4, [['NDVI', 'i']], { 'font-size': small });
+  }
+
+  let y = 0;
+  // (a) Panel fixed effects
+  if (wide) runs(g, 0, 16, [['(a) Panel fixed effects: ', 'b'], ['the same plot in months with more and with less PM2.5', 'i']]);
+  else { runs(g, 0, 16, [['(a) Panel fixed effects', 'b']]); runs(g, 0, 34, [['the same plot, more and less PM2.5', 'i']], { 'font-size': small }); }
+  y = wide ? 34 : 50;
+  const inputs = [['PM2.5', 'CAMS, 44 km', 'blue', 'model'], ['Weather', 'rain, temperature, humidity', '', 'model'], ['Night-time lights', 'VIIRS, previous month', '', 'satellite'], ['Fixed effects', 'plot × month, plot × year', 'yellow', 'fixed']];
+  if (wide) {
+    const iw = 230, ow = 250, mx = iw + 64, mw = W - mx - 64 - ow, top = y + 10;
+    inputs.forEach(([t, n, c, icon], k) => { box(0, top + k * 62, iw, t, n, c); badge(g, iw - 8, top + k * 62 + 2, icon); });
+    const mh = 4 * 62 - 10, my = top;
+    el('rect', { x: mx, y: my, width: mw, height: mh, rx: 10, class: 'box' }, g);
+    runs(g, mx + mw / 2, my + 28, [['Model: ', 'b'], ['one regression over 6.9 million plot-months', 'i']], { 'text-anchor': 'middle', 'font-size': small });
+    const e1 = math(mx + mw / 2, my + mh / 2 - 4, EQ1);
+    const e2 = math(mx + mw / 2, my + mh / 2 + 26, EQ2);
+    if (Math.max(e1.getComputedTextLength(), e2.getComputedTextLength()) > mw - 24) { e1.setAttribute('font-size', fs); e2.setAttribute('font-size', fs); }
+    runs(g, mx + mw / 2, my + mh - 18, [['ρ, η: fixed effects; X: weather and lights', 'i']], { 'text-anchor': 'middle', 'font-size': small });
+    inputs.forEach((_, k) => arrow(iw + 2, top + k * 62 + 26, mx - 4, my + mh / 2 - 45 + k * 30));
+    const ox = W - ow;
+    el('rect', { x: ox, y: my, width: ow, height: mh, rx: 10, class: 'box green' }, g);
+    runs(g, ox + ow / 2, my + 28, [['Output: ', 'b'], ['turning point', 'i']], { 'text-anchor': 'middle', 'font-size': small });
+    curve(ox + 34, my + 62, ow - 64, 96);
+    badge(g, ox + ow - 8, my + 2, 'estimate');
+    math(ox + ow / 2, my + mh - 16, TURN, 'middle', fs);
+    hollow(mx + mw + 8, my + mh / 2, ox - 8, my + mh / 2);
+    y = my + mh + 64;
+  } else {
+    const cw = (W - 10) / 2;
+    inputs.forEach(([t, n, c, icon], k) => { const bx = (k % 2) * (cw + 10), by = y + Math.floor(k / 2) * 62; box(bx, by, cw, t, n, c); badge(g, bx + cw - 8, by + 2, icon); });
+    y += 2 * 62 - 10;
+    arrow(W / 2, y + 4, W / 2, y + 30);
+    y += 36;
+    el('rect', { x: 0, y, width: W, height: 132, rx: 10, class: 'box' }, g);
+    runs(g, W / 2, y + 24, [['Model: ', 'b'], ['6.9 million plot-months', 'i']], { 'text-anchor': 'middle', 'font-size': small });
+    const e1 = math(W / 2, y + 60, EQ1), e2 = math(W / 2, y + 90, EQ2);
+    const fit = Math.min(1, (W - 20) / Math.max(e1.getComputedTextLength(), e2.getComputedTextLength()));
+    if (fit < 1) { e1.setAttribute('font-size', (fs + 1) * fit); e2.setAttribute('font-size', (fs + 1) * fit); }
+    runs(g, W / 2, y + 118, [['ρ, η: fixed effects; X: weather and lights', 'i']], { 'text-anchor': 'middle', 'font-size': small });
+    y += 132;
+    hollow(W / 2, y + 6, W / 2, y + 40);
+    y += 46;
+    el('rect', { x: 0, y, width: W, height: 200, rx: 10, class: 'box green' }, g);
+    runs(g, W / 2, y + 24, [['Output: ', 'b'], ['turning point', 'i']], { 'text-anchor': 'middle', 'font-size': small });
+    curve(W / 2 - 110, y + 54, 220, 90);
+    badge(g, W - 8, y + 2, 'estimate');
+    math(W / 2, y + 186, TURN, 'middle', fs);
+    y += 200 + 52;
+  }
+
+  // (b) Instrumental variables
+  if (wide) runs(g, 0, y, [['(b) Instrumental variables: ', 'b'], ['pollution the delta does not make', 'i']]);
+  else { runs(g, 0, y, [['(b) Instrumental variables', 'b']]); runs(g, 0, y + 18, [['pollution the delta does not make', 'i']], { 'font-size': small }); y += 16; }
+  y += 22;
+  const chain = [['Fires abroad', '48 regions, downwind months', '', 'satellite'], ['PM2.5 in the delta', 'predicted from the fires', 'blue', 'estimate'], ['Crop health (NDVI)', '−0.016 per 10% more PM2.5', 'green', 'estimate']];
+  const links = [['first stage', [['π', 'v'], ['1', 's'], [' = 0.551, ', ''], ['F', 'v'], [' = 19', '']]], ['second stage', [['β', 'v'], ['1', 's'], [' = −0.169', '']]]];
+  if (wide) {
+    const gap = 150, bw = (W - 2 * gap) / 3, top = y + 18;
+    chain.forEach(([t, n, c, icon], k) => { box(k * (bw + gap), top, bw, t, n, c); badge(g, k * (bw + gap) + bw - 8, top + 2, icon); });
+    links.forEach(([a, b], k) => {
+      const x0 = (k + 1) * bw + k * gap + 6, x1 = x0 + gap - 12;
+      arrow(x0, top + 26, x1, top + 26);
+      runs(g, (x0 + x1) / 2, top + 14, [[a, 'b']], { 'text-anchor': 'middle', 'font-size': small });
+      math((x0 + x1) / 2, top + 46, b, 'middle', small + 1);
+    });
+    y = top + 52 + 30;
+  } else {
+    chain.forEach(([t, n, c, icon], k) => {
+      box(0, y, W, t, n, c);
+      badge(g, W - 8, y + 2, icon);
+      y += 52;
+      if (k < 2) {
+        arrow(36, y + 4, 36, y + 44);
+        runs(g, 52, y + 22, [[links[k][0], 'b']], { 'font-size': small });
+        math(52, y + 38, links[k][1], 'start', small + 1);
+        y += 48;
+      }
+    });
+    y += 26;
+  }
+  const note = wide ? [['35 grid cells of 44 km, 562 grid-months; grid, month and year fixed effects. ', 'i'], ['Placebo: ', 'b'], ['the same fires in upwind months show no effect.', 'i']]
+    : [['Placebo: ', 'b'], ['upwind months show no effect.', 'i']];
+  runs(g, 0, y, note, { 'font-size': small });
+  y += 18 + iconLegend(g, 0, y + 18, wide ? Math.min(W, 820) : W, ['satellite', 'model', 'fixed', 'estimate'], small);
+  svg.setAttribute('height', y + 4);
+  svg.setAttribute('viewBox', `0 0 ${W} ${y + 4}`);
 });
 
 // Policy: haze episodes against ordinary changes.
