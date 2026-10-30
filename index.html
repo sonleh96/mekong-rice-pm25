@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Air pollution and rice crop health</title>
-<meta name="description" content="Satellite data on 1.1 million rice plots in Vietnam's Mekong Delta show crop health declining once PM2.5 passes about 16.5 µg/m³. Scientific Reports, 2026.">
+<meta name="description" content="Air pollution is a farm problem as well as a health one. Satellite data on 1.1 million rice plots in Vietnam's Mekong Delta show crop health declining once PM2.5 passes about 16.5 µg/m³, below the delta's average. Scientific Reports, 2026.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Air pollution and rice crop health: evidence from Vietnam's Mekong Delta">
-<meta property="og:description" content="Rice health in the Mekong Delta declines once PM2.5 passes about 16.5 µg/m³, just below the delta's average. Scientific Reports, 2026.">
+<meta property="og:description" content="Haze is a risk to rice as well as to health. Crop health in Vietnam's Mekong Delta declines once PM2.5 passes about 16.5 µg/m³, below the delta's average. Scientific Reports, 2026.">
 <meta property="og:url" content="https://sonleh96.github.io/mekong-rice-pm25/">
 <meta property="og:image" content="https://sonleh96.github.io/mekong-rice-pm25/img/og.png">
 <link rel="canonical" href="https://sonleh96.github.io/mekong-rice-pm25/">
@@ -85,7 +85,8 @@ button { font: inherit; color: inherit; }
 .nav ul::-webkit-scrollbar { display: none; }
 .nav li a { display: block; padding: 6px 10px; border-radius: 6px; font-size: 0.875rem; color: var(--soft); text-decoration: none; white-space: nowrap; }
 .nav li a[aria-current="true"] { color: var(--ink); background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
-@media (max-width: 640px) { .nav-title { display: none; } .nav ul { margin-left: -10px; } .nav .wrap { gap: 12px; } }
+/* On phones the links scroll; the fade says there are more, and the end padding keeps the last link clear of it. */
+@media (max-width: 640px) { .nav-title { display: none; } .nav ul { margin-left: -10px; padding-right: 28px; mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } .nav .wrap { gap: 12px; } }
 .theme { flex: none; position: relative; width: 46px; height: 26px; padding: 0; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; transition: transform 160ms var(--ease-out); }
 .theme:active { transform: scale(0.96); }
 .theme-knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; transform: translateX(var(--knob-x)); transition: transform 220ms var(--ease-out); }
@@ -164,6 +165,8 @@ h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.005em; }
 .findings li::before { content: counter(finding, decimal-leading-zero); font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.04em; color: var(--accent); }
 .findings h3 { margin-top: 10px; font-family: var(--serif); font-size: 1.375rem; font-weight: 500; line-height: 1.25; }
 .findings p { margin-top: 10px; color: var(--soft); font-size: 1rem; }
+.findings.policy { margin-bottom: 0; }
+@media (min-width: 760px) { .findings.policy { grid-template-columns: repeat(2, 1fr); } }
 
 /* Tables */
 .results-grid { display: grid; gap: 56px; }
@@ -223,6 +226,7 @@ footer .wrap { display: grid; gap: 8px; }
     <ul>
       <li><a href="#findings">Findings</a></li>
       <li><a href="#haze">Haze</a></li>
+      <li><a href="#policy">Policy</a></li>
       <li><a href="#data">Data</a></li>
       <li><a href="#cite">Cite</a></li>
     </ul>
@@ -255,7 +259,7 @@ footer .wrap { display: grid; gap: 8px; }
     </figure>
 
     <div class="hero-text">
-      <p class="lede">Satellite data on 1.1 million rice plots show crop health declining once fine-particle pollution passes about 16.5&nbsp;&micro;g/m&sup3;, just below the delta&rsquo;s average. Haze blown in from fires in neighbouring countries points the same way.</p>
+      <p class="lede">Air pollution is counted as a health problem. In Vietnam&rsquo;s Mekong Delta it looks like a farm problem too. Satellite data on 1.1 million rice plots show crop health declining once PM2.5 passes about 16.5&nbsp;&micro;g/m&sup3;, below the delta&rsquo;s average, and haze from fires in neighbouring countries points the same way.</p>
       <div class="links">
         <a class="btn primary" href="https://www.nature.com/articles/s41598-026-75454-8" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
@@ -280,7 +284,7 @@ footer .wrap { display: grid; gap: 8px; }
 
 <div class="wrap">
   <div class="numbers">
-    <div><b>16.5<i>&micro;g/m&sup3;</i></b><span>PM2.5 level where rice health starts to decline</span><small>Delta average: 18.5</small></div>
+    <div><b>16.5<i>&micro;g/m&sup3;</i></b><span>PM2.5 level where rice health starts to decline</span><small>Delta average 18.5; WHO guideline 5</small></div>
     <div><b>1.1M</b><span>One-hectare rice plots followed through the reproductive stage</span><small>10.75M plot-months, 2017 to 2022</small></div>
     <div><b>5.5%</b><span>More PM2.5 in the delta for 10% more fire activity abroad</span><small>48 fire regions in neighbouring countries</small></div>
     <div><b>&minus;0.016</b><span>Change in NDVI for 10% more haze-driven PM2.5</span><small>Mean NDVI 0.28; p&nbsp;&lt;&nbsp;0.10</small></div>
@@ -405,10 +409,42 @@ footer .wrap { display: grid; gap: 8px; }
   </div>
 </section>
 
+<section id="policy">
+  <div class="wrap">
+    <div class="head">
+      <p class="label mono">03 &middot; Policy</p>
+      <div class="measure">
+        <h2>Haze is a risk to rice, too</h2>
+        <p>The study&rsquo;s main implication is that transboundary air pollution is a potential agricultural risk as well as a public-health hazard. The Mekong Delta is one of the world&rsquo;s main rice regions, so even modest damage during sensitive growth stages may matter when haze recurs across large areas.</p>
+      </div>
+    </div>
+
+    <ol class="findings policy">
+      <li>
+        <h3>Cleaner air would help crops too</h3>
+        <p>Damage starts at 16.5&nbsp;&micro;g/m&sup3;, below the delta&rsquo;s average of 18.5 and well above the WHO guideline of 5. Cutting PM2.5 for people&rsquo;s health should also help rice while it fills grain.</p>
+      </li>
+      <li>
+        <h3>Episodes may matter more than averages</h3>
+        <p>Per unit of PM2.5, haze episodes show an effect about 21 times larger than ordinary month-to-month changes, &minus;0.169 against &minus;0.0079. Measurement error may explain part of the gap, but sustained haze during grain filling is a plausible cause. When haze arrives matters as well as how much there is.</p>
+      </li>
+      <li>
+        <h3>The source is across the border</h3>
+        <p>The haze that moves the delta&rsquo;s PM2.5 comes from fires in 48 regions of neighbouring countries, where burning remains a cheap way to clear land. Vietnam&rsquo;s own rules cannot reach it, so it calls for regional coordination.</p>
+      </li>
+      <li>
+        <h3>Free satellite data can give early warning</h3>
+        <p>Every input to the study is free and covers the region. Combining haze forecasts with crop calendars could flag where rice is filling grain under heavy haze, so responses reach the right places at the right time.</p>
+      </li>
+    </ol>
+    <p class="caption table-note measure">The study measures crop health from satellites, not harvests or losses in money, and its results apply most directly to drier, well-observed plot-months. See the paper&rsquo;s Discussion.</p>
+  </div>
+</section>
+
 <section id="data">
   <div class="wrap">
     <div class="head">
-      <p class="label mono">03 &middot; Data and method</p>
+      <p class="label mono">04 &middot; Data and method</p>
       <div class="measure">
         <h2>Ten open datasets on one 100&nbsp;m grid</h2>
         <p>Every source is free to use. All are resampled to a common 100&nbsp;m grid. PM2.5 keeps its coarse 44&nbsp;km structure, so neighbouring cells are far from independent, and every result is also tested with errors clustered at 44&nbsp;km.</p>
@@ -454,7 +490,7 @@ footer .wrap { display: grid; gap: 8px; }
 <section id="cite">
   <div class="wrap">
     <div class="head">
-      <p class="label mono">04 &middot; Citation</p>
+      <p class="label mono">05 &middot; Citation</p>
       <div class="measure"><h2>Cite this work</h2></div>
     </div>
     <div class="indent">
