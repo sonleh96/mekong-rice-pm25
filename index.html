@@ -309,6 +309,20 @@ tr.key td:last-child { padding-right: 10px; }
 td strong { color: var(--accent); font-weight: 600; }
 .table-note { margin-top: 14px; }
 
+/* Data sources: the explanation column takes the room on wide screens; on phones each row stacks, measure and resolution on one line and the explanation and source below. */
+.data-table td.desc { color: var(--soft); min-width: 22em; }
+.data-table td.desc a { color: inherit; }
+@media (max-width: 639px) {
+  .data-table, .data-table tbody { display: block; }
+  .data-table thead { display: none; }
+  .data-table tr { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .data-table td { padding: 0; border: 0; }
+  .data-table td:first-child { font-weight: 500; }
+  .data-table td:nth-child(4) { grid-column: 2; grid-row: 1; text-align: right; color: var(--soft); }
+  .data-table td.desc { grid-column: 1 / -1; min-width: 0; font-size: 0.9375rem; }
+  .data-table td:nth-child(3) { grid-column: 1 / -1; font-family: var(--mono); font-size: 0.75rem; color: var(--soft); }
+}
+
 /* Haze */
 .fig3 { margin-bottom: 72px; }
 .fig3 figcaption { max-width: 72ch; }
@@ -396,7 +410,7 @@ footer .wrap { display: grid; gap: 8px; }
 <g class="scale"><line x1="28.7" x2="93.9" y1="525.6" y2="525.6"/><line x1="28.7" x2="28.7" y1="521.6" y2="529.6"/><line x1="93.9" x2="93.9" y1="521.6" y2="529.6"/><text x="61.3" y="517.6" text-anchor="middle">50 km</text></g>
 </svg><!-- fig1-map:end -->
       <div class="map-key" aria-hidden="true"><span><i class="r1"></i>1 crop cycle a year</span><span><i class="r2"></i>2</span><span><i class="r3"></i>3</span><span><i class="hatch"></i>Dong Thap, left out of the sample</span></div>
-      <figcaption>Rice-growing areas studied, by crop cycles a year. Redrawn from Fig.&nbsp;1 of the paper, read off the published map at about 1&nbsp;km. Provinces from geoBoundaries, neighbouring countries from Natural Earth.</figcaption>
+      <figcaption>Rice-growing areas studied, by crop cycles a year. Redrawn from Fig.&nbsp;1 of the paper, read off the published map at about 1&nbsp;km. Provinces as they were before July 2025, from geoBoundaries, neighbouring countries from Natural Earth.</figcaption>
     </figure>
 
     <div class="hero-text">
@@ -596,19 +610,19 @@ footer .wrap { display: grid; gap: 8px; }
     </div>
 
     <div class="table-wrap">
-      <table>
-        <thead><tr><th>Measure</th><th style="text-align:left">Source</th><th>Native resolution</th></tr></thead>
+      <table class="data-table">
+        <thead><tr><th>Measure</th><th style="text-align:left">What it measures</th><th style="text-align:left">Source</th><th>Native resolution</th></tr></thead>
         <tbody>
-          <tr><td>Crop health (NDVI)</td><td class="text">Sentinel-2</td><td>10 m</td></tr>
-          <tr><td>Crop health, radar (RVI)</td><td class="text">Sentinel-1</td><td>10 m</td></tr>
-          <tr><td>Rice areas</td><td class="text">JAXA high-resolution land use and land cover</td><td>10 m</td></tr>
-          <tr><td>Growth stage</td><td class="text">Rice crop calendar of Zhao et al.</td><td>~55 km</td></tr>
-          <tr><td>PM2.5</td><td class="text">Copernicus Atmosphere Monitoring Service</td><td>44 km</td></tr>
-          <tr><td>Rain, temperature, humidity</td><td class="text">ERA5-Land reanalysis</td><td>~11 km</td></tr>
-          <tr><td>Local economy</td><td class="text">NASA VIIRS Black Marble night-time lights</td><td>~500 m</td></tr>
-          <tr><td>Sunlight absorbed (fPAR)</td><td class="text">MODIS</td><td>500 m</td></tr>
-          <tr><td>Water stress (ESI)</td><td class="text">NASA-NOAA Evaporative Stress Index</td><td>4 km</td></tr>
-          <tr><td>Fires</td><td class="text">NASA FIRMS, MODIS brightness temperature</td><td>~1 km</td></tr>
+          <tr><td>Crop health (NDVI)</td><td class="text desc">Normalised Difference Vegetation Index: how green and dense the canopy is, from red and near-infrared light. Runs from &minus;1 to 1; higher is healthier.</td><td class="text">Sentinel-2</td><td>10 m</td></tr>
+          <tr><td>Crop health, radar (RVI)</td><td class="text desc">Radar Vegetation Index: how strongly the canopy scatters radar back. It sees through cloud but is not calibrated for these crops, so it serves as a cross-check.</td><td class="text">Sentinel-1</td><td>10 m</td></tr>
+          <tr><td>Rice areas</td><td class="text desc">Which 10&nbsp;m pixels are rice paddies.</td><td class="text">JAXA high-resolution land use and land cover</td><td>10 m</td></tr>
+          <tr><td>Growth stage</td><td class="text desc">Transplanting and harvest dates, used to pick out each plot&rsquo;s reproductive stage, from panicle formation to grain filling.</td><td class="text">Rice crop calendar of Zhao et al.</td><td>~55 km</td></tr>
+          <tr><td>PM2.5</td><td class="text desc">Mass of airborne particles 2.5 micrometres across or smaller, per cubic metre of air (&micro;g/m&sup3;).</td><td class="text">Copernicus Atmosphere Monitoring Service</td><td>44 km</td></tr>
+          <tr><td>Rain, temperature, humidity</td><td class="text desc">Weather that shapes both crop growth and pollution, used as controls in the main models.</td><td class="text">ERA5-Land reanalysis</td><td>~11 km</td></tr>
+          <tr><td>Local economy</td><td class="text desc">Brightness of lights at night, a widely used proxy for local economic activity and income (<a href="https://doi.org/10.1257/aer.102.2.994" target="_blank" rel="noopener">Henderson, Storeygard and Weil, 2012</a>). Taken from the previous month.</td><td class="text">NASA VIIRS Black Marble night-time lights</td><td>~500 m</td></tr>
+          <tr><td>Sunlight absorbed (fPAR)</td><td class="text desc">Fraction of photosynthetically active radiation: the share of sunlight usable for photosynthesis that the canopy absorbs, from 0 to 1.</td><td class="text">MODIS</td><td>500 m</td></tr>
+          <tr><td>Water stress (ESI)</td><td class="text desc">Evaporative Stress Index: how far the water given off by soil and plants falls below its expected rate. Lower means more water stress.</td><td class="text">NASA-NOAA Evaporative Stress Index</td><td>4 km</td></tr>
+          <tr><td>Fires</td><td class="text desc">Brightness temperature of actively burning fires, in kelvin. Averaged over the 48 selected regions, it is the instrument for PM2.5.</td><td class="text">NASA FIRMS, MODIS brightness temperature</td><td>~1 km</td></tr>
         </tbody>
       </table>
     </div>
@@ -624,6 +638,7 @@ footer .wrap { display: grid; gap: 8px; }
           <li>Satellite indices stand in for crop health and yield; they are not field measurements.</li>
           <li>Fertiliser, labour and irrigation are not observed, so farmers&rsquo; responses to haze cannot be ruled out.</li>
           <li>Ozone is not observed, so the haze estimates cover biomass-burning pollution as a whole.</li>
+          <li>The study predates the restructuring of Vietnam&rsquo;s administrative divisions that took effect on 1 July 2025. Provinces, Dong Thap among them, are named and bounded as they were before it.</li>
           <li>Dong Thap province is left out because its plots behave unlike the rest of the delta, possibly because of the Tram Chim wetland and the deep-flooding Plain of Reeds. With them, the turning point moves to 32.2&nbsp;&micro;g/m&sup3;.</li>
         </ul>
       </div>

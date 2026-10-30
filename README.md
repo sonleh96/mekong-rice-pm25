@@ -33,6 +33,7 @@ python3 tools/fetch_figures.py
 `tools/fig1/georef_any.py` fits the published map to real coordinates by matching province boundaries to its black lines.
 `tools/fig1/build_fig1_map.py` then reads the three rice classes off the image at 0.01 degree, about 1 km, and draws them over the boundaries as SVG.
 Provinces are geoBoundaries (gbOpen VNM ADM1, commit 9469f09) and neighbouring countries Natural Earth 10 m, both public domain.
+The provinces are those before Vietnam's administrative restructuring of 1 July 2025, which the study predates.
 
 ```bash
 cd tools/fig1
