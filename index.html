@@ -375,10 +375,10 @@ footer .wrap { display: grid; gap: 8px; }
   <div class="wrap">
     <a class="nav-title" href="#top">Rice and PM2.5</a>
     <ul>
+      <li><a href="#data">Data</a></li>
       <li><a href="#findings">Findings</a></li>
       <li><a href="#haze">Haze</a></li>
       <li><a href="#policy">Policy</a></li>
-      <li><a href="#data">Data</a></li>
       <li><a href="#cite">Cite</a></li>
     </ul>
     <button type="button" class="theme" id="theme" role="switch" aria-checked="false" aria-label="Dark mode" title="Dark mode">
@@ -472,10 +472,56 @@ footer .wrap { display: grid; gap: 8px; }
   </div>
 </section>
 
+<section id="data">
+  <div class="wrap">
+    <div class="head">
+      <p class="label mono">01 &middot; Data and method</p>
+      <div class="measure">
+        <h2>Ten open datasets on one 100&nbsp;m grid</h2>
+        <p>Every source is free to use. All are resampled to a common 100&nbsp;m grid. PM2.5 keeps its coarse 44&nbsp;km structure, so neighbouring cells are far from independent, and every result is also tested with errors clustered at 44&nbsp;km.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Measure</th><th style="text-align:left">What it measures</th><th style="text-align:left">Source</th><th>Native resolution</th></tr></thead>
+        <tbody>
+          <tr><td>Crop health (NDVI)</td><td class="text desc">Normalised Difference Vegetation Index: how green and dense the canopy is, from red and near-infrared light. Runs from &minus;1 to 1; higher is healthier.</td><td class="text">Sentinel-2</td><td>10 m</td></tr>
+          <tr><td>Crop health, radar (RVI)</td><td class="text desc">Radar Vegetation Index: how strongly the canopy scatters radar back. It sees through cloud but is not calibrated for these crops, so it serves as a cross-check.</td><td class="text">Sentinel-1</td><td>10 m</td></tr>
+          <tr><td>Rice areas</td><td class="text desc">Which 10&nbsp;m pixels are rice paddies.</td><td class="text">JAXA high-resolution land use and land cover</td><td>10 m</td></tr>
+          <tr><td>Growth stage</td><td class="text desc">Transplanting and harvest dates, used to pick out each plot&rsquo;s reproductive stage, from panicle formation to grain filling.</td><td class="text">Rice crop calendar of Zhao et al.</td><td>~55 km</td></tr>
+          <tr><td>PM2.5</td><td class="text desc">Mass of airborne particles 2.5 micrometres across or smaller, per cubic metre of air (&micro;g/m&sup3;).</td><td class="text">Copernicus Atmosphere Monitoring Service</td><td>44 km</td></tr>
+          <tr><td>Rain, temperature, humidity</td><td class="text desc">Weather that shapes both crop growth and pollution, used as controls in the main models.</td><td class="text">ERA5-Land reanalysis</td><td>~11 km</td></tr>
+          <tr><td>Local economy</td><td class="text desc">Brightness of lights at night, a widely used proxy for local economic activity and income (<a href="https://doi.org/10.1257/aer.102.2.994" target="_blank" rel="noopener">Henderson, Storeygard and Weil, 2012</a>). Taken from the previous month.</td><td class="text">NASA VIIRS Black Marble night-time lights</td><td>~500 m</td></tr>
+          <tr><td>Sunlight absorbed (fPAR)</td><td class="text desc">Fraction of photosynthetically active radiation: the share of sunlight usable for photosynthesis that the canopy absorbs, from 0 to 1.</td><td class="text">MODIS</td><td>500 m</td></tr>
+          <tr><td>Water stress (ESI)</td><td class="text desc">Evaporative Stress Index: how far the water given off by soil and plants falls below its expected rate. Lower means more water stress.</td><td class="text">NASA-NOAA Evaporative Stress Index</td><td>4 km</td></tr>
+          <tr><td>Fires</td><td class="text desc">Brightness temperature of actively burning fires, in kelvin. Averaged over the 48 selected regions, it is the instrument for PM2.5.</td><td class="text">NASA FIRMS, MODIS brightness temperature</td><td>~1 km</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="model-fig" id="model-fig">
+      <svg class="dg" role="img" aria-labelledby="model-title model-desc"><title id="model-title">The two models behind the estimates</title><desc id="model-desc">Panel a, panel fixed effects: PM2.5, weather and the previous month&rsquo;s night-time lights, with plot-by-month and plot-by-year fixed effects, explain NDVI through the equation NDVI equals beta one times log PM2.5 plus beta two times log PM2.5 squared plus controls and fixed effects. The fitted curve rises then falls, turning at 16.5 micrograms per cubic metre. Panel b, instrumental variables: fires in 48 regions abroad predict PM2.5 in the delta, first stage 0.551 with F of 19, and predicted PM2.5 lowers NDVI, second stage minus 0.169.</desc></svg>
+      <figcaption>Equations 1 to 3 of the paper. In (a), standard errors are clustered at 100&nbsp;m and, as the stricter test, wild-bootstrapped at 44&nbsp;km; the curve is a sketch of the fitted shape. In (b), the instrument is fire brightness in the 48 regions, counted only in downwind months and weighted by inverse squared distance. Data processing is in Python and estimation in Stata.</figcaption>
+    </figure>
+
+    <aside class="limits" aria-labelledby="limits-title">
+      <div class="limits-head"><span class="badge" aria-hidden="true">!</span><h3 id="limits-title">What the estimates do not show</h3></div>
+      <ol>
+        <li><b>Crop health, not harvests.</b> Satellite indices stand in for crop health and yield; they are not field measurements.</li>
+        <li><b>Farmers&rsquo; choices unseen.</b> Fertiliser, labour and irrigation are not observed, so farmers&rsquo; responses to haze cannot be ruled out.</li>
+        <li><b>Ozone not measured.</b> The haze estimates cover biomass-burning pollution as a whole, not PM2.5 alone.</li>
+        <li><b>Pre-2025 provinces.</b> The study predates the restructuring of Vietnam&rsquo;s administrative divisions that took effect on 1 July 2025. Provinces, Dong Thap among them, are named and bounded as they were before it.</li>
+        <li><b>Dong Thap left out.</b> Its plots behave unlike the rest of the delta, possibly because of the Tram Chim wetland and the deep-flooding Plain of Reeds. With them, the turning point moves to 32.2&nbsp;&micro;g/m&sup3;.</li>
+      </ol>
+    </aside>
+  </div>
+</section>
+
 <section id="findings">
   <div class="wrap">
     <div class="head">
-      <p class="label mono">01 &middot; Findings</p>
+      <p class="label mono">02 &middot; Findings</p>
       <div class="measure">
         <h2>Rice health peaks, then falls as pollution rises</h2>
         <p>The panel follows each plot through panicle formation, pollination and grain filling, the stage most sensitive to pollution. Plot-by-month and plot-by-year fixed effects absorb each plot&rsquo;s fixed traits, its usual seasonal pattern and its yearly trend, so every estimate compares a plot with itself.</p>
@@ -527,7 +573,7 @@ footer .wrap { display: grid; gap: 8px; }
 <section id="haze">
   <div class="wrap">
     <div class="head">
-      <p class="label mono">02 &middot; Transboundary haze</p>
+      <p class="label mono">03 &middot; Transboundary haze</p>
       <div class="measure">
         <h2>Fires abroad, haze in the delta</h2>
         <p>Local pollution could track local conditions that also affect crops. So the second analysis uses pollution the delta does not make. Fire detections from 418 regions in seven neighbouring countries count only in months when the wind blows from them toward the delta, weighted by inverse squared distance. An elastic net keeps the 48 regions that predict the delta&rsquo;s PM2.5.</p>
@@ -572,7 +618,7 @@ footer .wrap { display: grid; gap: 8px; }
 <section id="policy">
   <div class="wrap">
     <div class="head">
-      <p class="label mono">03 &middot; Policy</p>
+      <p class="label mono">04 &middot; Policy</p>
       <div class="measure">
         <h2>Haze is a risk to rice, too</h2>
         <p>The study&rsquo;s main implication is that transboundary air pollution is a potential agricultural risk as well as a public-health hazard. The Mekong Delta is one of the world&rsquo;s main rice regions, so even modest damage during sensitive growth stages may matter when haze recurs across large areas.</p>
@@ -611,52 +657,6 @@ footer .wrap { display: grid; gap: 8px; }
       </ol>
     </div>
     <p class="caption table-note measure">The study measures crop health from satellites, not harvests or losses in money, and its results apply most directly to drier, well-observed plot-months. See the paper&rsquo;s Discussion.</p>
-  </div>
-</section>
-
-<section id="data">
-  <div class="wrap">
-    <div class="head">
-      <p class="label mono">04 &middot; Data and method</p>
-      <div class="measure">
-        <h2>Ten open datasets on one 100&nbsp;m grid</h2>
-        <p>Every source is free to use. All are resampled to a common 100&nbsp;m grid. PM2.5 keeps its coarse 44&nbsp;km structure, so neighbouring cells are far from independent, and every result is also tested with errors clustered at 44&nbsp;km.</p>
-      </div>
-    </div>
-
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead><tr><th>Measure</th><th style="text-align:left">What it measures</th><th style="text-align:left">Source</th><th>Native resolution</th></tr></thead>
-        <tbody>
-          <tr><td>Crop health (NDVI)</td><td class="text desc">Normalised Difference Vegetation Index: how green and dense the canopy is, from red and near-infrared light. Runs from &minus;1 to 1; higher is healthier.</td><td class="text">Sentinel-2</td><td>10 m</td></tr>
-          <tr><td>Crop health, radar (RVI)</td><td class="text desc">Radar Vegetation Index: how strongly the canopy scatters radar back. It sees through cloud but is not calibrated for these crops, so it serves as a cross-check.</td><td class="text">Sentinel-1</td><td>10 m</td></tr>
-          <tr><td>Rice areas</td><td class="text desc">Which 10&nbsp;m pixels are rice paddies.</td><td class="text">JAXA high-resolution land use and land cover</td><td>10 m</td></tr>
-          <tr><td>Growth stage</td><td class="text desc">Transplanting and harvest dates, used to pick out each plot&rsquo;s reproductive stage, from panicle formation to grain filling.</td><td class="text">Rice crop calendar of Zhao et al.</td><td>~55 km</td></tr>
-          <tr><td>PM2.5</td><td class="text desc">Mass of airborne particles 2.5 micrometres across or smaller, per cubic metre of air (&micro;g/m&sup3;).</td><td class="text">Copernicus Atmosphere Monitoring Service</td><td>44 km</td></tr>
-          <tr><td>Rain, temperature, humidity</td><td class="text desc">Weather that shapes both crop growth and pollution, used as controls in the main models.</td><td class="text">ERA5-Land reanalysis</td><td>~11 km</td></tr>
-          <tr><td>Local economy</td><td class="text desc">Brightness of lights at night, a widely used proxy for local economic activity and income (<a href="https://doi.org/10.1257/aer.102.2.994" target="_blank" rel="noopener">Henderson, Storeygard and Weil, 2012</a>). Taken from the previous month.</td><td class="text">NASA VIIRS Black Marble night-time lights</td><td>~500 m</td></tr>
-          <tr><td>Sunlight absorbed (fPAR)</td><td class="text desc">Fraction of photosynthetically active radiation: the share of sunlight usable for photosynthesis that the canopy absorbs, from 0 to 1.</td><td class="text">MODIS</td><td>500 m</td></tr>
-          <tr><td>Water stress (ESI)</td><td class="text desc">Evaporative Stress Index: how far the water given off by soil and plants falls below its expected rate. Lower means more water stress.</td><td class="text">NASA-NOAA Evaporative Stress Index</td><td>4 km</td></tr>
-          <tr><td>Fires</td><td class="text desc">Brightness temperature of actively burning fires, in kelvin. Averaged over the 48 selected regions, it is the instrument for PM2.5.</td><td class="text">NASA FIRMS, MODIS brightness temperature</td><td>~1 km</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <figure class="model-fig" id="model-fig">
-      <svg class="dg" role="img" aria-labelledby="model-title model-desc"><title id="model-title">The two models behind the estimates</title><desc id="model-desc">Panel a, panel fixed effects: PM2.5, weather and the previous month&rsquo;s night-time lights, with plot-by-month and plot-by-year fixed effects, explain NDVI through the equation NDVI equals beta one times log PM2.5 plus beta two times log PM2.5 squared plus controls and fixed effects. The fitted curve rises then falls, turning at 16.5 micrograms per cubic metre. Panel b, instrumental variables: fires in 48 regions abroad predict PM2.5 in the delta, first stage 0.551 with F of 19, and predicted PM2.5 lowers NDVI, second stage minus 0.169.</desc></svg>
-      <figcaption>Equations 1 to 3 of the paper. In (a), standard errors are clustered at 100&nbsp;m and, as the stricter test, wild-bootstrapped at 44&nbsp;km; the curve is a sketch of the fitted shape. In (b), the instrument is fire brightness in the 48 regions, counted only in downwind months and weighted by inverse squared distance. Data processing is in Python and estimation in Stata.</figcaption>
-    </figure>
-
-    <aside class="limits" aria-labelledby="limits-title">
-      <div class="limits-head"><span class="badge" aria-hidden="true">!</span><h3 id="limits-title">What the estimates do not show</h3></div>
-      <ol>
-        <li><b>Crop health, not harvests.</b> Satellite indices stand in for crop health and yield; they are not field measurements.</li>
-        <li><b>Farmers&rsquo; choices unseen.</b> Fertiliser, labour and irrigation are not observed, so farmers&rsquo; responses to haze cannot be ruled out.</li>
-        <li><b>Ozone not measured.</b> The haze estimates cover biomass-burning pollution as a whole, not PM2.5 alone.</li>
-        <li><b>Pre-2025 provinces.</b> The study predates the restructuring of Vietnam&rsquo;s administrative divisions that took effect on 1 July 2025. Provinces, Dong Thap among them, are named and bounded as they were before it.</li>
-        <li><b>Dong Thap left out.</b> Its plots behave unlike the rest of the delta, possibly because of the Tram Chim wetland and the deep-flooding Plain of Reeds. With them, the turning point moves to 32.2&nbsp;&micro;g/m&sup3;.</li>
-      </ol>
-    </aside>
   </div>
 </section>
 
