@@ -125,7 +125,10 @@ figure { margin: 0; }
 figure figcaption { margin-top: 12px; }
 
 /* The article is CC BY-NC-ND, so its figures are shown exactly as published, on white, in both themes. */
-.paper-fig { background: #fff; border-radius: var(--radius); padding: clamp(10px, 2.5vw, 24px); border: 1px solid var(--line); }
+.paper-fig { background: var(--paper, #fff); border-radius: var(--radius); padding: clamp(10px, 2.5vw, 24px); border: 1px solid var(--line); }
+.paper-fig img { mix-blend-mode: multiply; }
+:root[data-theme="dark"] { --paper: #CFCBC3; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #CFCBC3; } }
 
 /* Key numbers */
 /* Each stat is value, label, context. Subgrid lines those three rows up across the strip whatever the label lengths. */
@@ -159,7 +162,7 @@ h2 { font-size: clamp(1.9rem, 3.4vw, 2.4rem); font-weight: 700; line-height: 1.1
 h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.005em; }
 .abstract { font-size: 1.125rem; line-height: 1.7; }
 /* Grid items default to min-width: auto and would stretch to a wide table instead of letting it scroll. */
-.hero-grid > *, .head > *, .results-grid > *, .iv-grid > *, .iv-side > * { min-width: 0; }
+.hero-grid > *, .head > *, .results-grid > *, .iv-grid > * { min-width: 0; }
 
 /* Findings */
 .findings { display: grid; gap: 16px; margin: 0 0 64px; padding: 0; list-style: none; counter-reset: finding; }
@@ -210,7 +213,7 @@ h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.005em; }
 .dg .cursor-dot { fill: var(--d-ink); }
 .fig3 svg { cursor: crosshair; touch-action: pan-y; }
 .fig3 svg:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-.readout { margin-top: 10px; min-height: 1.5em; font-family: var(--cm); font-size: 0.9375rem; color: var(--soft); }
+.readout { margin-top: 8px; min-height: 1.5em; font-family: var(--cm); font-size: 0.875rem; color: var(--soft); }
 .readout b { color: var(--ink); }
 
 /* Study-area map (hero): rice classes on one green ramp, more cycles darker; Dong Thap hatched. */
@@ -307,9 +310,10 @@ td strong { color: var(--accent); font-weight: 600; }
 .table-note { margin-top: 14px; }
 
 /* Haze */
-.iv-grid { display: grid; gap: 40px; }
-@media (min-width: 900px) { .iv-grid { grid-template-columns: 5fr 7fr; align-items: start; } }
-.iv-side { display: grid; gap: 48px; }
+.fig3 { margin-bottom: 72px; }
+.fig3 figcaption { max-width: 72ch; }
+.iv-grid { display: grid; gap: 48px; }
+@media (min-width: 900px) { .iv-grid { grid-template-columns: 4fr 8fr; gap: 56px; align-items: start; } }
 
 /* Data and caveats */
 .caveats { margin: 16px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
@@ -501,36 +505,35 @@ footer .wrap { display: grid; gap: 8px; }
       </div>
     </div>
 
+    <!-- The chart is the evidence, so it runs full width; the instrument map and the estimates follow side by side. -->
+    <figure class="fig3" id="fig3">
+      <svg class="dg" role="img" tabindex="0" aria-labelledby="fig3-title fig3-desc"><title id="fig3-title">Fire activity abroad and PM2.5 in the delta</title><desc id="fig3-desc">Two panels over the 42 sample months from January 2017 to late 2022. Top: log PM2.5 in the Mekong Delta, between about 1.9 and 3.8. Bottom: average fire brightness in the 48 regions abroad, zero in most months with six spikes between 0.7 and 1.2, which are shaded across both panels. Use the left and right arrow keys to read values.</desc></svg>
+      <p class="readout" aria-live="polite">Hover or tap the chart for values; with the keyboard, focus it and use the arrow keys.</p>
+      <figcaption>Redrawn from Fig.&nbsp;3 of the paper by reading values off the published image, accurate to about &plusmn;0.03. The fire series is zero in upwind months by construction. Months are the sample months in order, so the axis is not evenly spaced in time.</figcaption>
+    </figure>
+
     <div class="iv-grid">
-      <figure>
+      <figure class="fig2">
         <div class="paper-fig"><img src="img/fig2-fire-regions.webp" width="825" height="1086" loading="lazy" alt="Map of Southeast Asia with administrative regions outlined. Some regions are shaded red, in mainland Southeast Asia, peninsular Malaysia, Borneo, Sumatra and Java."></div>
         <figcaption>Biomass burning in neighbouring regions used as the instrument. Fig.&nbsp;2 of the paper.</figcaption>
       </figure>
 
-      <div class="iv-side">
-        <figure class="fig3" id="fig3">
-          <svg class="dg" role="img" tabindex="0" aria-labelledby="fig3-title fig3-desc"><title id="fig3-title">Fire activity abroad and PM2.5 in the delta</title><desc id="fig3-desc">Two panels over the 42 sample months from January 2017 to late 2022. Top: log PM2.5 in the Mekong Delta, between about 1.9 and 3.8. Bottom: average fire brightness in the 48 regions abroad, zero in most months with six spikes between 0.7 and 1.2, which are shaded across both panels. Use the left and right arrow keys to read values.</desc></svg>
-          <p class="readout" aria-live="polite">Hover or tap the chart, or focus it and use the arrow keys, to read values.</p>
-          <figcaption>Redrawn from Fig.&nbsp;3 of the paper by reading values off the published image, accurate to about &plusmn;0.03. The fire series is zero in upwind months by construction. Months are the sample months in order, so the axis is not evenly spaced in time.</figcaption>
-        </figure>
-
-        <div>
-          <h3>Instrumental-variable estimates</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Outcome</th><th>Estimate</th><th>SE</th><th>AR p</th></tr></thead>
-              <tbody>
-                <tr class="key"><td>NDVI</td><td><strong>&minus;0.169*</strong></td><td class="se">(0.084)</td><td>0.026</td></tr>
-                <tr><td>Radar vegetation index</td><td>&minus;0.101*</td><td class="se">(0.058)</td><td>0.058</td></tr>
-                <tr><td>fPAR</td><td><strong>&minus;0.485***</strong></td><td class="se">(0.105)</td><td>&lt;&nbsp;0.001</td></tr>
-                <tr><td>Water stress (ESI)</td><td>&minus;1.134</td><td class="se">(0.898)</td><td>0.097</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="caption table-note stack">
-            <p>Effect of log PM2.5 on each outcome, by two-stage least squares on 35 PM2.5 grid cells of 44&nbsp;km: 562 grid-months, 535 for fPAR and ESI. First stage: 0.551*** (0.127), Kleibergen-Paap F 18.96, or 16.78 for fPAR and ESI. AR p is the Anderson-Rubin weak-instrument test, wild-bootstrapped at 44&nbsp;km. Table 4. * p&nbsp;&lt;&nbsp;0.10, *** p&nbsp;&lt;&nbsp;0.01.</p>
-            <p>As a placebo, fires from the same regions in upwind months give estimates indistinguishable from zero (Supplementary Table A3).</p>
-          </div>
+      <div class="iv-table">
+        <h3>Instrumental-variable estimates</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Outcome</th><th>Estimate</th><th>SE</th><th>AR p</th></tr></thead>
+            <tbody>
+              <tr class="key"><td>NDVI</td><td><strong>&minus;0.169*</strong></td><td class="se">(0.084)</td><td>0.026</td></tr>
+              <tr><td>Radar vegetation index</td><td>&minus;0.101*</td><td class="se">(0.058)</td><td>0.058</td></tr>
+              <tr><td>fPAR</td><td><strong>&minus;0.485***</strong></td><td class="se">(0.105)</td><td>&lt;&nbsp;0.001</td></tr>
+              <tr><td>Water stress (ESI)</td><td>&minus;1.134</td><td class="se">(0.898)</td><td>0.097</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="caption table-note stack">
+          <p>Effect of log PM2.5 on each outcome, by two-stage least squares on 35 PM2.5 grid cells of 44&nbsp;km: 562 grid-months, 535 for fPAR and ESI. First stage: 0.551*** (0.127), Kleibergen-Paap F 18.96, or 16.78 for fPAR and ESI. AR p is the Anderson-Rubin weak-instrument test, wild-bootstrapped at 44&nbsp;km. Table 4. * p&nbsp;&lt;&nbsp;0.10, *** p&nbsp;&lt;&nbsp;0.01.</p>
+          <p>As a placebo, fires from the same regions in upwind months give estimates indistinguishable from zero (Supplementary Table A3).</p>
         </div>
       </div>
     </div>
